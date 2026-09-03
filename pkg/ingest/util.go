@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -35,6 +36,10 @@ func IngesterPartitionID(ingesterID string) (int32, error) {
 	ingesterSeq, err := strconv.Atoi(match[1])
 	if err != nil {
 		return 0, fmt.Errorf("no ingester sequence number in ingester ID %s", ingesterID)
+	}
+
+	if ingesterSeq > math.MaxInt32 {
+		return 0, fmt.Errorf("ingester sequence number in larget than max int 32 %s", ingesterID)
 	}
 
 	return int32(ingesterSeq), nil
