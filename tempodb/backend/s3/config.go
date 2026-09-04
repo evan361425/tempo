@@ -67,9 +67,10 @@ type Config struct {
 	Metadata         map[string]string `yaml:"metadata"`
 	// Deprecated
 	// See https://github.com/grafana/tempo/pull/3006 for more details
-	NativeAWSAuthEnabled  bool      `yaml:"native_aws_auth_enabled"`
-	ListBlocksConcurrency int       `yaml:"list_blocks_concurrency"`
-	SSE                   SSEConfig `yaml:"sse"`
+	NativeAWSAuthEnabled      bool      `yaml:"native_aws_auth_enabled"`
+	ListBlocksConcurrency     int       `yaml:"list_blocks_concurrency"`
+	ListObjectsPaginationSize int       `yaml:"list_objects_pagination_size"`
+	SSE                       SSEConfig `yaml:"sse"`
 }
 
 func (cfg *Config) RegisterFlagsAndApplyDefaults(prefix string, f *flag.FlagSet) {
@@ -81,6 +82,7 @@ func (cfg *Config) RegisterFlagsAndApplyDefaults(prefix string, f *flag.FlagSet)
 	f.Var(&cfg.SecretKey, util.PrefixConfig(prefix, "s3.secret_key"), "s3 secret key.")
 	f.Var(&cfg.SessionToken, util.PrefixConfig(prefix, "s3.session_token"), "s3 session token.")
 	f.IntVar(&cfg.ListBlocksConcurrency, util.PrefixConfig(prefix, "s3.list_blocks_concurrency"), 3, "number of concurrent list calls to make to backend")
+	f.IntVar(&cfg.ListObjectsPaginationSize, util.PrefixConfig(prefix, "s3.list_object_pagination_size"), 100, "max keys to return in a single list objects response")
 
 	f.StringVar(&cfg.SSE.Type, util.PrefixConfig(prefix, "s3.sse.type"), "", fmt.Sprintf("Enable AWS Server Side Encryption. Supported values: %s.", strings.Join(supportedSSETypes, ", ")))
 	f.StringVar(&cfg.SSE.KMSKeyID, util.PrefixConfig(prefix, "s3.sse.kms-key-id"), "", "KMS Key ID used to encrypt objects in S3")

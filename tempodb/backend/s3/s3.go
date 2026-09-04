@@ -362,7 +362,7 @@ func (rw *readerWriter) List(_ context.Context, keypath backend.KeyPath) ([]stri
 	isTruncated := true
 	for isTruncated {
 		// ListObjects(bucket, prefix, nextMarker, delimiter string, maxKeys int)
-		res, err := rw.core.ListObjects(rw.cfg.Bucket, prefix, nextMarker, "/", 0)
+		res, err := rw.core.ListObjects(rw.cfg.Bucket, prefix, nextMarker, "/", rw.cfg.ListObjectsPaginationSize)
 		if err != nil {
 			return nil, fmt.Errorf("error listing blocks in s3 bucket, bucket: %s: %w", rw.cfg.Bucket, err)
 		}
@@ -423,7 +423,7 @@ func (rw *readerWriter) ListBlocks(
 					return
 				}
 
-				res, err = rw.core.ListObjectsV2(rw.cfg.Bucket, prefix, startAfter, res.NextContinuationToken, "", 0)
+				res, err = rw.core.ListObjectsV2(rw.cfg.Bucket, prefix, startAfter, res.NextContinuationToken, "", rw.cfg.ListObjectsPaginationSize)
 				if err != nil {
 					errChan <- fmt.Errorf("error finding objects in s3 bucket, bucket: %s: %w", rw.cfg.Bucket, err)
 					return
@@ -506,7 +506,7 @@ func (rw *readerWriter) Find(ctx context.Context, keypath backend.KeyPath, f bac
 		case <-ctx.Done():
 			return
 		default:
-			res, err = rw.core.ListObjectsV2(rw.cfg.Bucket, prefix, "", nextToken, "", 0)
+			res, err = rw.core.ListObjectsV2(rw.cfg.Bucket, prefix, "", nextToken, "", rw.cfg.ListObjectsPaginationSize)
 			if err != nil {
 				return fmt.Errorf("error finding objects in s3 bucket, bucket: %s: %w", rw.cfg.Bucket, err)
 			}
